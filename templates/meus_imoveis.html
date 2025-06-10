@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Imóveis - Republic{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/apt.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1 style="text-align: center; margin-top: 40px;">Meus Imóveis Anunciados</h1>
+
+<main style="max-width: 1000px; margin: 0 auto; padding: 40px 20px; min-height: 60vh;">
+    {% if imoveis %}
+    <ul class="ap-lista" style="list-style: none; padding: 0;">
+        {% for apt in imoveis %}
+        <li
+            style="display: flex; align-items: center; gap: 20px; border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 20px; background-color: #f9f9f9;">
+            <img src="{{ url_for('static', filename='img/imoveis/' + (apt[5] if apt[5] else 'default.jpg')) }}"
+                width="150" style="border-radius: 8px; object-fit: cover;">
+
+            <div style="flex: 1;">
+                <h3 style="margin: 0 0 10px;">{{ apt[4] }} - {{ apt[1] }}, {{ apt[2] }}</h3>
+                <p style="margin: 0 0 10px;">Valor: <strong>R$ {{ apt[3] }}</strong></p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <a href="{{ url_for('properties.detalhes_imovel', id=apt[0]) }}" class="btn-link">Ver detalhes</a>
+                    <a href="{{ url_for('properties.editar_imovel', id=apt[0]) }}" class="btn-link">Editar</a>
+
+                    {% if apt[6] == 1 %}
+                    <form action="{{ url_for('properties.parar_anuncio', id=apt[0]) }}" method="post"
+                        style="display:inline;">
+                        <button type="submit" class="btn-link">Parar Anúncio</button>
+                    </form>
+                    {% else %}
+                    <form action="{{ url_for('properties.ativar_anuncio', id=apt[0]) }}" method="post"
+                        style="display:inline;">
+                        <button type="submit" class="btn-link">Voltar a Anunciar</button>
+                    </form>
+                    {% endif %}
+
+                    <form action="{{ url_for('properties.excluir_imovel', id=apt[0]) }}" method="post"
+                        style="display:inline;">
+                        <button type="submit" onclick="return confirm('Tem certeza?')"
+                            class="btn-link delete">Excluir</button>
+                    </form>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p style="text-align: center; font-size: 18px; margin-top: 60px;">Você ainda não cadastrou nenhum imóvel.</p>
+    {% endif %}
+</main>
+
+
+{% endblock %}

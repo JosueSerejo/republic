@@ -1,0 +1,170 @@
+/* ===== pesquisa.css (/_css/pesquisa.css) ===== */
+
+/* Override para não herdar width/height fixos de .card do style.css */
+html,
+body {
+    overflow-x: hidden;
+    /* Bloqueia o scroll horizontal */
+    width: 100%;
+}
+
+.search-bar {
+    margin: 20px;
+    text-align: center;
+}
+
+.search-bar input {
+    padding: 10px;
+    width: 50%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+main {
+    display: flex;
+}
+
+.filters {
+    width: 17%;
+    padding: 20px;
+    background: #f0f0f0;
+    margin: 20px;
+    border-radius: 20px;
+}
+
+.filters h3 {
+    margin-top: 10px;
+}
+
+.filters h4 {
+    margin-top: 20px;
+}
+
+/* NOVO: Estilo para o contêiner dos campos de valor "De:" e "Até:" */
+.filter-group-inline {
+    display: flex;
+    /* Transforma em um contêiner flexível */
+    align-items: center;
+    /* Alinha itens verticalmente ao centro */
+    gap: 5px;
+    /* Espaço entre o label e o input */
+    margin-bottom: 10px;
+    /* Espaço entre o grupo "De:" e "Até:" */
+}
+
+.filter-group-inline label {
+    flex-shrink: 0;
+    /* Impede que o label encolha */
+    font-weight: bold;
+    min-width: 20px;
+    /* Garante uma largura mínima para os labels "De:" e "Até:" */
+    text-align: right;
+    /* Alinha o texto do label à direita */
+}
+
+.filter-group-inline input[type="number"] {
+    flex-grow: 1;
+    /* Faz o input preencher o espaço restante */
+    width: auto;
+    /* Anula o width: 100% que pode estar vindo de outro lugar */
+    max-width: 55px;
+    /* Limita a largura do input para não ficar muito grande */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.cards {
+    width: 78%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.cards .card {
+    width: 100%;
+    height: 300px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 0;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+    padding: 20px;
+}
+
+.preco {
+    font-weight: bold;
+    font-size: 1.2em;
+    text-align: left;
+    flex: 1;
+}
+
+.botao {
+    text-align: right;
+}
+
+.botao a {
+    background-color: black;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.botao a:hover {
+    background-color: #333;
+}
+
+
+footer {
+    background: black;
+    color: white;
+    padding: 20px;
+    margin-top: 40px;
+}
+
+.footer-columns {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-columns div {
+    text-align: center;
+}
+
+
+/* NOVO: Contêiner principal para os campos "De:" e "Até:" */
+.valores {
+    display: flex;
+    /* Transforma em um contêiner flexível */
+    gap: 10px;
+    /* Espaço entre os grupos "De:" e "Até:" */
+    margin-bottom: 10px;
+    /* Espaço abaixo deste grupo de valor */
+    flex-wrap: wrap;
+    /* Permite quebrar a linha em telas muito pequenas */
+    justify-content: space-between;
+    /* Distribui o espaço entre os dois grupos */
+}

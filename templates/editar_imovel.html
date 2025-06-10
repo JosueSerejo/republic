@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Imóvel{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro_imovel.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="container_imovel">
+    <h1>EDITAR INFORMAÇÕES DO IMÓVEL</h1>
+    <form class="form-container" id="editarImovelForm">
+        <input type="hidden" id="imovelId" name="imovelId">
+        <div class="form-left">
+            <label for="tipo">Tipo do imóvel</label>
+            <select name="tipo" id="tipo" required>
+                <option value="">Selecione...</option>
+                <option value="casa">Casa</option>
+                <option value="apartamento">Apartamento</option>
+                <option value="kitnet">Kitnet</option>
+            </select>
+
+            <label>Endereço</label>
+            <input type="text" name="endereco" id="endereco" required />
+
+            <label>Bairro</label>
+            <input type="text" name="bairro" id="bairro" required />
+
+            <label>Número</label>
+            <input type="text" name="numero" id="numero" required />
+
+            <label>CEP</label>
+            <input type="text" name="cep" id="cep" placeholder="Ex: 64200-000" required />
+
+            <label>Complemento</label>
+            <input type="text" name="complemento" id="complemento" placeholder="Ex: Próximo à tal lugar" required />
+
+            <label>Adicionar fotos:</label>
+            <div class="upload-foto">
+                <input type="file" name="fotos" id="foto-input" style="display:none" multiple
+                    onchange="previewImages(event)">
+                <label for="foto-input" class="btn-upload">+</label>
+            </div>
+
+            <div id="image-preview-container"></div>
+            <div id="existing-images-container"></div>
+
+            <label>Valor (mês)</label>
+            <div class="input-valor">
+                <span class="prefixo">R$</span>
+                <input type="text" name="valor" id="valor" placeholder="0,00" required />
+            </div>
+        </div>
+
+        <div class="form-right">
+            <div class="box">
+                <label>Quantidade de quartos</label>
+                <input type="number" name="quartos" id="quartos" min="0" placeholder="Ex: 3" required />
+
+                <label>Quantidade de banheiros</label>
+                <input type="number" name="banheiros" id="banheiros" min="0" placeholder="Ex: 2" required />
+
+                <label>Inclusos:</label>
+                <label><input type="checkbox" name="inclusos" value="Água"> Água</label>
+                <label><input type="checkbox" name="inclusos" value="Luz"> Luz</label>
+                <label><input type="checkbox" name="inclusos" value="Internet"> Internet</label>
+                <label><input type="checkbox" name="inclusos" value="Mobiliado"> Mobiliado</label>
+                <label><input type="checkbox" name="inclusos" value="Gás"> Gás</label>
+                <label><input type="checkbox" name="inclusos" value="Garagem"> Garagem</label>
+
+                <label for="outros">Outros:</label>
+                <input type="text" id="outros" name="outros" placeholder="Ex: Piscina, Faxina..." />
+            </div>
+
+            <div class="descricao">
+                <label><strong>Descrição do imóvel</strong></label>
+                <textarea name="descricao" id="descricao" required></textarea>
+            </div>
+        </div>
+
+        <button type="submit">Confirmar Edição</button>
+    </form>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Define a URL para 'meus_imoveis' que será usada pelo editar_imovel.js
+    window.meusImoveisUrl = "{{ url_for('properties.meus_imoveis') }}";
+</script>
+<script src="{{ url_for('static', filename='js/editar_imovel.js') }}"></script>
+{% endblock %}

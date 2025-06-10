@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Início - Republic{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <a class="btn-hero" href="{{ url_for('properties.pesquisa') }}">Encontre um imóvel</a>
+        <div class="gallery">
+            <img src="{{ url_for('static', filename='img/home/1.jpg') }}" alt="Apartamento 1">
+            <div class="maior">
+                <img src="{{ url_for('static', filename='img/home/2.jpg') }}" alt="Apartamento 2">
+            </div>
+            <img src="{{ url_for('static', filename='img/home/3.avif') }}" alt="Apartamento 3">
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <h2>Aqui você encontra aquele apê que é a sua cara</h2>
+    <div class="feature-cards">
+        <div class="card">
+            <img src="{{ url_for('static', filename='img/icons/capelo.png') }}" alt="capelo1">
+            <p>Perto da faculdade</p>
+        </div>
+        <div class="card">
+            <img src="{{ url_for('static', filename='img/icons/dinheiro.png') }}" alt="dinheiro">
+            <p>Preço que cabe no seu bolso</p>
+        </div>
+        <div class="card">
+            <img src="{{ url_for('static', filename='img/icons/trato.png') }}" alt="trato">
+            <p>Sem perrengue e sem enrolação</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

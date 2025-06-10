@@ -1,0 +1,252 @@
+/* Estilos base */
+main {
+    font-family: Arial, sans-serif;
+    padding: 2rem;
+    background-color: #fafafa;
+    color: #333;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+h2 {
+    margin-top: 2rem;
+    color: #34495e;
+}
+
+/* Tabelas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+    white-space: nowrap;
+    /* Evita que o texto quebre, mantendo a linha única */
+    overflow: hidden;
+    /* Esconde o texto que excede */
+    text-overflow: ellipsis;
+    /* Adiciona '...' para texto excedente */
+}
+
+th {
+    background-color: #ecf0f1;
+    font-weight: bold;
+}
+
+/* Estatísticas */
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* Permite que os cards quebrem a linha */
+    gap: 20px;
+    /* Espaço entre os cards */
+    justify-content: center;
+    /* Centraliza os cards horizontalmente */
+    margin-bottom: 2rem;
+    max-width: 1200px;
+    /* Alinha com o admin-container */
+    margin: 20px auto;
+    /* Centraliza o container de stats */
+    padding: 10px;
+    /* Padding interno para o container de stats */
+    background-color: #f8f9fa;
+    /* Um fundo leve para o container */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilo individual para cada card de estatística */
+.stat-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    flex: 1;
+    /* Permite que os cards cresçam */
+    min-width: 180px;
+    /* Largura mínima para cada card */
+    max-width: 220px;
+    /* Largura máxima para cada card, para não ficarem gigantes */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para o nome da estatística */
+.card-name {
+    font-size: 0.95em;
+    color: #666;
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Estilo para o número da estatística */
+.card-number {
+    font-size: 2.2em;
+    /* Tamanho maior */
+    color: #007bff;
+    /* Cor principal, ajuste se quiser */
+    font-weight: bold;
+    line-height: 1;
+    /* Para centralizar verticalmente o número */
+}
+
+/* Container principal (APENAS PARA EMPILHAR AS SEÇÕES) */
+.admin-container {
+    display: flex;
+    flex-direction: column;
+    /* Faz com que as seções filhas (.admin-section) se empilhem verticalmente */
+    gap: 30px;
+    /* Espaço entre as seções empilhadas */
+    max-width: 1200px;
+    /* Largura máxima para o painel */
+    margin: 20px auto;
+    /* Centraliza o painel na tela */
+    padding: 20px;
+}
+
+
+.admin-section {
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    /* Ocupa toda a largura disponível no contêiner pai (admin-container) */
+    max-height: 400px;
+    /* Altura máxima da seção antes de adicionar scroll (ajuste conforme necessário) */
+    overflow-y: auto;
+    /* Adiciona scroll vertical se o conteúdo exceder a altura */
+    padding-right: 10px;
+    /* Adiciona um pouco de padding para o scrollbar não cobrir o conteúdo */
+}
+
+
+
+/* Cartão de imóvel*/
+.imovel-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: #f5f5f5;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.imovel-info {
+    flex: 1;
+}
+
+/* Container dos botões no cartão (vertical) */
+.imovel-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 20px;
+    flex-shrink: 0;
+}
+
+.imovel-actions form {
+    margin: 0;
+}
+
+/* Grupo de botões lado a lado (para tabelas) */
+.btn-group {
+    display: inline-flex;
+    gap: 8px;
+}
+
+/* Botões - geral */
+button {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Botão ativar */
+.btn-ativar {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btn-ativar:hover {
+    background-color: #1e8449;
+}
+
+/* Botão parar */
+.btn-parar {
+    background-color: #ffaa00;
+    color: white;
+}
+
+.btn-parar:hover {
+    background-color: #cc8800;
+}
+
+/* Botão excluir */
+.btn-excluir {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-excluir:hover {
+    background-color: #c0392b;
+}
+
+/* Botões de Aceitar/Negar */
+.btn-aceitar {
+    background-color: #28a745;
+    /* Verde */
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-aceitar:hover {
+    background-color: #218838;
+}
+
+.btn-negar {
+    background-color: #ffc107;
+    /* Amarelo */
+    color: #212529;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-negar:hover {
+    background-color: #e0a800;
+}

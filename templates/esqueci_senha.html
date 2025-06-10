@@ -1,0 +1,30 @@
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth_forms.css') }}"> 
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-logo">
+        <a href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='img/logo/logo_preta.png') }}" alt="Republic Logo">
+        </a>
+    </div>
+
+    <h2>Esqueci Minha Senha</h2>
+
+    <p style="margin-bottom: 1.5rem; text-align:left;">Por favor, insira o seu endereço de email. Enviaremos um link
+        para você redefinir sua senha.</p>
+
+    <form method="POST" action="{{ url_for('auth.esqueci_senha') }}">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Link de Redefinição</button>
+    </form>
+    <div class="auth-links">
+        <a href="{{ url_for('auth.login') }}">Voltar para o Login</a>
+    </div>
+</div>
+{% endblock %}

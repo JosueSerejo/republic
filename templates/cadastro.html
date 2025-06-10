@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastro{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-overlay">
+        <div class="auth-container">
+            <div class="auth-column login-column">
+                <h2>Entrar na Republic</h2>
+                <form class="auth-form" action="{{ url_for('auth.login') }}" method="post">
+                    <input type="email" name="email" placeholder="E-mail" title="" required class="form-control" />
+                    <input type="password" name="senha" placeholder="Senha" title="" required class="form-control" />
+                    <button type="submit" class="btn-primary">Entrar</button>
+                    <div class="forgot-password-link">
+                        <a href="{{ url_for('auth.esqueci_senha') }}" class="auth-links-small">Esqueci a senha</a>
+                    </div>
+                </form>
+
+                {% if mensagem_login %}
+                <p class="login-message">{{ mensagem_login }}</p>
+                {% endif %}
+            </div>
+
+            <div class="auth-column cadastro-column">
+                <h2>Criar Conta</h2>
+                <form class="auth-form" action="/cadastro" method="post" onsubmit="return validarTelefoneECPF()">
+                    <input type="text" name="nome" placeholder="Nome completo" title="" required />
+
+                    <div class="cpf-field" id="cpfFieldContainer">
+                        <input type="text" name="cpf" id="cpf" placeholder="CPF (somente números)" pattern="\d{11}"
+                            title="CPF deve conter 11 números." required />
+                    </div>
+
+                    <input type="email" name="email" placeholder="E-mail" title="" required />
+                    <input type="password" name="senha" placeholder="Senha"
+                        title="Utilize letras, números e símbolos para um senha mais segura." required />
+                    <input type="text" name="telefone" id="telefone" placeholder="Telefone"
+                        pattern="\(\d{2}\) \d{5}-\d{4}" title="Formato esperado: (99) 99999-9999" required />
+
+                    <div class="tipo-usuario-container">
+                        <p>Tipo de usuário:</p>
+                        <label>
+                            <input type="radio" name="tipo_usuario" value="anunciante" required>
+                            <span>Anunciante</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="tipo_usuario" value="buscando" required>
+                            <span>Buscando moradia</span>
+                        </label>
+                    </div>
+
+                    <div class="cadastro-footer">
+                        <label class="termos">
+                            <input type="checkbox" name="termos" required />
+                            <span>Concordo com os <a href="{{ url_for('termos') }}">Termos de serviço</a></span>
+                        </label>
+                        <button type="submit">Criar conta</button>
+                    </div>
+                </form>
+
+                {% if mensagem %}
+                <p class="cadastro-message {{ 'success' if 'sucesso' in mensagem else 'error' }}">{{ mensagem }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/cadastro_geral.js') }}"></script>
+{% endblock %}

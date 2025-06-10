@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Painel Admin - {{ super() }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1>Painel Administrativo</h1>
+
+<div class="stats-container">
+
+    <div class="stat-card">
+        <div class="card-name">Usuários cadastrados</div>
+        <div class="card-number">{{ total_usuarios }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="card-name">Imóveis ativos</div>
+        <div class="card-number">{{ ativos }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="card-name">Imóveis inativos</div>
+        <div class="card-number">{{ inativos }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="card-name">Total de imóveis</div>
+        <div class="card-number">{{ total_imoveis }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="card-name">Acessos (sessão atual)</div>
+        <div class="card-number">{{ acessos }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="card-name">Anunciantes contatados</div>
+        <div class="card-number">{{ contact_anunciante_clicks }}</div>
+    </div>
+
+</div>
+
+<div class="admin-container">
+
+    <div class="admin-section">
+        <h2>Lista de Usuários</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Tipo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td>{{ u.id }}</td>
+                    <td>{{ u.nome }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.telefone }}</td>
+                    <td>{{ u.tipo_usuario }}</td>
+                    <td>
+                        {% if u.id != session.usuario_id %}
+                        <form method="post" action="{{ url_for('admin.excluir_usuario', id=u.id) }}"
+                            style="display:inline;">
+                            <button type="submit" class="btn-excluir"
+                                onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</button>
+                        </form>
+                        {% else %}
+                        <em>Não pode excluir</em>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="admin-section">
+        <h2>Lista de Imóveis</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo</th>
+                    <th>Endereço</th>
+                    <th>Valor</th>
+                    <th>Dono</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for imovel in imoveis %}
+                <tr>
+                    <td>{{ imovel.id }}</td>
+                    <td>{{ imovel.tipo }}</td>
+                    <td>{{ imovel.endereco }}</td>
+                    <td>{{ imovel.valor }}</td>
+                    <td>{{ imovel.dono_nome }}</td>
+                    <td>{{ 'Ativo' if imovel.ativo else 'Inativo' }}</td>
+                    <td>
+                        <div class="btn-group">
+                            <form method="post" action="{{ url_for('admin.admin_toggle_anuncio', id=imovel.id) }}"
+                                style="display:inline;">
+                                <button type="submit"
+                                    class="{% if imovel.ativo %}btn-parar{% else %}btn-ativar{% endif %}">
+                                    {% if imovel.ativo %}
+                                    Parar
+                                    {% else %}
+                                    Ativar
+                                    {% endif %}
+                                </button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin.admin_excluir_imovel', id=imovel.id) }}"
+                                style="display:inline;">
+                                <button type="submit" class="btn-excluir"
+                                    onclick="return confirm('Tem certeza que deseja excluir este imóvel?');">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="admin-section">
+        <h2>Solicitações de Exclusão de Conta</h2>
+        {% if solicitacoes_pendentes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in solicitacoes_pendentes %}
+                <tr>
+                    <td>{{ s.id }}</td>
+                    <td>{{ s.nome }}</td>
+                    <td>{{ s.email }}</td>
+                    <td>{{ s.telefone }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.aceitar_exclusao', user_id=s.id) }}"
+                            style="display:inline;">
+                            <button type="submit" class="btn-aceitar"
+                                onclick="return confirm('Tem certeza que deseja APROVAR a exclusão da conta de {{ s.nome }}? Isso irá remover o usuário e seus imóveis.');">Aprovar</button>
+                        </form>
+                        <form method="post" action="{{ url_for('admin.negar_exclusao', user_id=s.id) }}"
+                            style="display:inline; margin-left: 10px;">
+                            <button type="submit" class="btn-negar"
+                                onclick="return confirm('Tem certeza que deseja NEGAR a exclusão da conta de {{ s.nome }}?');">Negar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhuma solicitação de exclusão pendente no momento.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

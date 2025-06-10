@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Sobre - Republic{% endblock %}
+
+{% block content %}
+
+<section class="bloco">
+    <section class="about">
+        <div class="container">
+            <h2>Sobre a Republic</h2>
+            <p>
+                A Republic nasceu com a missão de transformar a experiência de estudantes universitários que precisam
+                encontrar um lar longe de casa. Sabemos que iniciar a vida acadêmica já traz consigo uma série de
+                desafios
+                — novos ambientes, novas responsabilidades e, muitas vezes, a distância da família. Em meio a tantas
+                mudanças,
+                buscar um lugar confortável, seguro e acessível para morar não deveria ser mais uma preocupação.
+            </p>
+            <p>
+                Pensando nisso, criamos uma plataforma que tem como propósito principal facilitar essa jornada.
+                Nosso objetivo é conectar estudantes a imóveis localizados próximos às universidades, com preços que
+                cabem no orçamento e, acima de tudo, com o mínimo de burocracia possível. Queremos tornar esse processo
+                mais humano, mais leve e mais seguro, entendendo as reais necessidades de quem está começando uma
+                nova etapa da vida.
+            </p>
+            <p>
+                Na Republic, acreditamos que a moradia é muito mais do que um simples teto:
+                é onde o estudante descansa depois de um dia cheio, onde estuda para as provas,
+                onde cria laços e histórias com novas amizades. Por isso, nosso compromisso é oferecer
+                uma solução completa, que não apenas agilize a busca por um imóvel, mas que também ofereça
+                tranquilidade e confiança em cada etapa do caminho.
+            </p>
+            <p>
+                Estamos aqui para apoiar cada estudante nessa fase tão importante, ajudando a transformar a casa
+                provisória
+                em um verdadeiro lar — um lugar para crescer, aprender e viver intensamente todos os momentos da vida
+                universitária.
+            </p>
+        </div>
+    </section>
+
+    <section class="team">
+        <div class="container">
+            <h2>Nossa equipe</h2>
+            <div class="team-members">
+                <div class="member">
+                    <img src="{{ url_for('static', filename='img/equipe/fco.jpeg') }}" alt="Equipe"
+                        class="img-funcionarios">
+                    <p>Francisco Neto<br><small>Desenvolvedor</small></p>
+                </div>
+                <div class="member">
+                    <img src="{{ url_for('static', filename='img/equipe/gab.jpeg') }}" alt="Equipe"
+                        class="img-funcionarios">
+                    <p>Gabriel Oliveira<br><small>Desenvolvedor</small></p>
+                </div>
+                <div class="member">
+                    <img src="{{ url_for('static', filename='img/equipe/luis.jpg') }}" alt="Equipe"
+                        class="img-funcionarios">
+                    <p>Luis Felipe<br><small>Desenvolvedor</small></p>
+                </div>
+                <div class="member">
+                    <img src="{{ url_for('static', filename='img/equipe/serejo.png') }}" alt="Equipe"
+                        class="img-funcionarios">
+                    <p>Willamy Josué<br><small>Desenvolvedor</small></p>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+{% endblock %}

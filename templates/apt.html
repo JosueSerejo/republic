@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/apt.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+{% endblock %}
+
+{% block title %}Detalhes do Imóvel - Republic{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <div class="image-gallery side-by-side">
+    <div class="main-img">
+      {% if apartamento.imagens and apartamento.imagens|length > 0 %}
+      <img id="current-img" src="{{ url_for('static', filename='img/imoveis/' + apartamento.imagens[0]) }}"
+        alt="Imagem principal">
+      {% else %}
+      <img id="current-img" src="{{ url_for('static', filename='img/imoveis/default.jpg') }}" alt="Imagem padrão">
+      {% endif %}
+    </div>
+    <div class="thumbs">
+      {% for img in apartamento.imagens %}
+      <img class="thumb" src="{{ url_for('static', filename='img/imoveis/' + img) }}" alt="Imagem"
+        onclick="changeImage('{{ img }}')">
+      {% endfor %}
+    </div>
+  </div>
+
+  <section class="details">
+    <h2>{{ apartamento.tipo }}: {{ apartamento.endereco }}, {{ apartamento.bairro }}{% if apartamento.complemento %} -
+      {{ apartamento.complemento }}{% endif %}</h2>
+
+    <div class="anunciante" style="display: flex; align-items: center; gap: 10px;">
+      <span>Anunciante: {{ dono_nome }}</span>
+      {% if usuario_logado == apartamento.usuario_id %}
+      <form action="{{ url_for('properties.parar_anuncio', id=apartamento.id) }}" method="POST" class="inline-form">
+        <button type="submit" class="btn btn-danger">Parar Anúncio</button>
+      </form>
+      {% endif %}
+    </div>
+
+
+    <ul class="info">
+      <li>{{ apartamento.quartos }} quartos</li>
+      <li>{{ apartamento.banheiros }} banheiros</li>
+      <li>{{ apartamento.outros }}</li>
+    </ul>
+
+    <div class="highlights">
+      {% for item in apartamento.inclusos %}
+      <span>{{ item }}</span>
+      {% endfor %}
+    </div>
+
+    <section class="description">
+      <h3>Descrição</h3>
+      <p>{{ apartamento.descricao }}</p>
+    </section>
+
+    <div class="price-action">
+      <span class="price">R$ {{ apartamento.valor }} / mês</span>
+      {% if telefone_dono %}
+      {% set telefone_formatado = telefone_dono|replace('(', '')|replace(')', '')|replace('-', '')|replace(' ', '') %}
+
+      {% if usuario_logado %}
+      <a href="https://wa.me/55{{ telefone_formatado }}?text=Olá!%20Tenho%20interesse%20em%20reservar%20a%20estadia."
+        target="_blank">
+        <button class="btn" id="contactAnuncianteBtn">Falar com anunciante</button>
+      </a>
+      {% else %}
+      <a href="{{ url_for('auth.login') }}">
+        <button class="btn">Faça login para contatar</button>
+      </a>
+      {% endif %}
+
+      {% else %}
+      <button class="btn" disabled>WhatsApp indisponível</button>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="map">
+    <h3>Localização</h3>
+    <div id="map"></div>
+  </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/gallery.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

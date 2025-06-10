@@ -1,0 +1,113 @@
+/* static/css/flash_messages.css */
+
+.flash-message-container {
+    position: fixed;
+    /* Fixa na tela */
+    top: 20px;
+    /* Distância do topo */
+    left: 50%;
+    /* Inicia no meio da tela horizontalmente */
+    transform: translateX(-50%);
+    /* Move para trás metade da sua própria largura para centralizar */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    /* Para empilhar mensagens verticalmente */
+    align-items: center;
+    /* Para centralizar as mensagens individualmente */
+    gap: 10px;
+}
+
+.flash-message {
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: white;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 250px;
+    max-width: 400px;
+    animation: fadeIn 0.5s forwards;
+    /* Animação de entrada */
+    opacity: 0;
+    /* Começa invisível para a animação */
+}
+
+/* Estilos por categoria */
+.flash-message.flash-message-success {
+    background-color: #28a745;
+    /* Verde */
+}
+
+.flash-message.flash-message-danger {
+    background-color: #dc3545;
+    /* Vermelho */
+}
+
+.flash-message.flash-message-info {
+    background-color: #17a2b8;
+    /* Azul claro */
+}
+
+.flash-message.flash-message-warning {
+    background-color: #ffc107;
+    /* Amarelo (texto escuro para contraste) */
+    color: #343a40;
+}
+
+.close-btn {
+    margin-left: 20px;
+    font-size: 1.5em;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+    /* Alinha o "x" verticalmente */
+    color: inherit;
+    /* Herda a cor do texto da mensagem */
+    opacity: 0.7;
+    /* Suave */
+    transition: opacity 0.2s ease;
+}
+
+.close-btn:hover {
+    opacity: 1;
+}
+
+/* Animação de saída (quando a mensagem é fechada) */
+.flash-message.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+        height: 0;
+        /* Colapsa o elemento após o fade out */
+        padding: 0;
+        /* Remove padding */
+        margin: 0;
+        /* Remove margem */
+        border: none;
+        /* Remove borda */
+    }
+}
