@@ -127,4 +127,4 @@ if __name__ == '__main__':
     # Inicializa o banco de dados dentro de um contexto de aplicação
     with app.app_context():
         inicializar_banco()
-    app.run(debug=True) # Isso só roda em desenvolvimento local
+    app.run(debug=True)

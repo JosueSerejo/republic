@@ -26,7 +26,7 @@ def enviar_email_reset_senha(user_email, reset_link):
         to_email = To(user_email)
         subject = "Redefinição de Senha para Republic"
         
-        # Conteúdo do e-mail em HTML para uma formatação melhor
+        # Conteúdo do e-mail em HTML
         html_content = f"""
         <!DOCTYPE html>
         <html>
