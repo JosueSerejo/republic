@@ -120,8 +120,11 @@ def termos():
     """
     return render_template('termos.html')
 
+# app.py (parte final)
+# ...
+
 if __name__ == '__main__':
     # Inicializa o banco de dados dentro de um contexto de aplicação
-    with app.app_context(): # ESTA LINHA É A CHAVE DA SOLUÇÃO
+    with app.app_context():
         inicializar_banco()
-    app.run(debug=True)
+    app.run(debug=True) # Isso só roda em desenvolvimento local
