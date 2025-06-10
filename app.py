@@ -1,13 +1,12 @@
 # app.py (Arquivo principal da aplicação)
 
-from flask import Flask, render_template, g, flash, session, jsonify, request, current_app # Adicionado current_app
+from flask import Flask, render_template, g, flash, session, jsonify, request, current_app # current_app adicionado
 # Importa funções do módulo database
-from database import close_db, inicializar_banco, get_db
-# Importa o blueprint de autenticação e o decorador
-from auth import bp as auth_bp # login_required não é usado diretamente aqui, mas em auth.py
-from properties import bp as properties_bp # Importa o blueprint de imóveis
-# Importa o blueprint de admin e o decorador
-from admin import bp as admin_bp # admin_required não é usado diretamente aqui, mas em admin.py
+from database import close_db, inicializar_banco, get_db # get_db adicionado
+# Importa os blueprints
+from auth import bp as auth_bp
+from properties import bp as properties_bp
+from admin import bp as admin_bp
 from config import Config # Importa a classe de configuração
 
 app = Flask(__name__)
@@ -33,12 +32,17 @@ def track_click():
         if event_name:
             db = get_db() # Obtém a conexão com o banco de dados
             
-            # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+            # NOVO: Crie um cursor a partir da conexão
+            if current_app.config.get('DATABASE_URL'):
+                cur = db.cursor() 
+            else:
+                cur = db
+
             param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
 
             try:
                 if current_app.config.get('DATABASE_URL'): # PostgreSQL
-                    db.execute(
+                    cur.execute( # Use cur.execute
                         """
                         INSERT INTO click_counts (event_name, count) VALUES (%s, %s)
                         ON CONFLICT (event_name) DO UPDATE SET count = click_counts.count + 1
@@ -46,7 +50,7 @@ def track_click():
                         (event_name, 1) # No PostgreSQL, insere 1 ou incrementa 1
                     )
                 else: # SQLite
-                    db.execute(
+                    cur.execute( # Use cur.execute
                         'INSERT OR REPLACE INTO click_counts (event_name, count) VALUES (?, COALESCE((SELECT count FROM click_counts WHERE event_name = ?), 0) + 1)',
                         (event_name, event_name)
                     )
@@ -70,14 +74,17 @@ def inject_usuario():
     # Usa g.get para evitar KeyError se não estiver setado
     user_id = g.get('usuario_id')
     if user_id:
-        # Não precisa importar get_db aqui se já está importado no topo do arquivo
-        # from database import get_db
         db = get_db()
-        
-        # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+        # NOVO: Crie um cursor a partir da conexão para PostgreSQL (com DictCursor) ou use a conexão direta para SQLite
+        if current_app.config.get('DATABASE_URL'):
+            import psycopg2.extras # Importado aqui para evitar circular import se database.py for usar current_app
+            cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        else: # Para SQLite
+            cur = db # A conexão SQLite tem execute() diretamente ou age como um cursor
+
         param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
         
-        cur = db.execute(
+        cur.execute( # Use cur.execute
             f'SELECT nome, tipo_usuario FROM usuarios WHERE id = {param_placeholder}', (user_id,)
         )
         row = cur.fetchone()
@@ -101,7 +108,7 @@ def load_logged_in_user():
 @app.route('/')
 def index():
     """
-    Rota da página inicial. Incrementa o contador de acessos.
+    Roda da página inicial. Incrementa o contador de acessos.
     """
     app.acessos += 1
     return render_template('index.html')
@@ -109,22 +116,19 @@ def index():
 @app.route('/sobre')
 def sobre():
     """
-    Rota da página "Sobre".
+    Roda da página "Sobre".
     """
     return render_template('sobre.html')
 
 @app.route('/termos')
 def termos():
     """
-    Rota da página "Termos de Uso".
+    Roda da página "Termos de Uso".
     """
     return render_template('termos.html')
 
-# app.py (parte final)
-# ...
-
 if __name__ == '__main__':
     # Inicializa o banco de dados dentro de um contexto de aplicação
-    with app.app_context():
+    with app.app_context(): # ESTA LINHA É A CHAVE DA SOLUÇÃO
         inicializar_banco()
     app.run(debug=True)

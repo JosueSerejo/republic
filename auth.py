@@ -2,10 +2,11 @@
 
 from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, session, g, flash, current_app # Adicionado current_app
-import sqlite3
+import sqlite3 # Importado para capturar sqlite3.IntegrityError e sqlite3.Error
 import uuid # Adicionado para gerar tokens únicos
 from datetime import datetime, timedelta # Adicionado para controlar a expiração do token
-import psycopg2 # Para lidar com erros específicos do psycopg2 (PostgreSQL)
+import psycopg2 # Importado para capturar psycopg2.IntegrityError e psycopg2.Error
+import psycopg2.extras # Importado para usar DictCursor com PostgreSQL
 
 # NOVO: Imports para SendGrid
 import sendgrid
@@ -89,10 +90,15 @@ def inject_usuario():
     user_id = session.get('usuario_id')
     if user_id:
         db = get_db()
-        # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+        # NOVO: Crie um cursor a partir da conexão para PostgreSQL (com DictCursor) ou use a conexão direta para SQLite
+        if current_app.config.get('DATABASE_URL'):
+            cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        else: # Para SQLite
+            cur = db # A conexão SQLite tem execute() diretamente ou age como um cursor
+
         param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
         
-        cur = db.execute(
+        cur.execute( # Use cur.execute
             f'SELECT nome, tipo_usuario FROM usuarios WHERE id = {param_placeholder}', (user_id,)
         )
         row = cur.fetchone()
@@ -112,14 +118,19 @@ def cadastro():
     if request.method == 'POST':
         nome = request.form['nome']
         email = request.form['email']
-        senha = request.form['senha'] # Senha não está hashada, considerar hashing
+        senha = request.form['senha'] # Senha não está hashada, considerar hashing para segurança real
         telefone = request.form['telefone']
         tipo_usuario = request.form['tipo_usuario']
         db = get_db()
-        # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+        # NOVO: Crie um cursor a partir da conexão (sem DictCursor para INSERT)
+        if current_app.config.get('DATABASE_URL'):
+            cur = db.cursor() 
+        else:
+            cur = db
+        
         param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
         try:
-            db.execute(
+            cur.execute( # Use cur.execute
                 f'INSERT INTO usuarios (nome, email, senha, telefone, tipo_usuario) VALUES ({param_placeholder}, {param_placeholder}, {param_placeholder}, {param_placeholder}, {param_placeholder})',
                 (nome, email, senha, telefone, tipo_usuario)
             )
@@ -129,9 +140,11 @@ def cadastro():
             return redirect(url_for('auth.login'))
         except (sqlite3.IntegrityError, psycopg2.IntegrityError) as e: # Captura erros de integridade de ambos os bancos
             flash('Email já cadastrado. Tente outro email ou faça login.', 'danger')
+            db.rollback() # Reverte a transação em caso de erro de integridade
         except Exception as e: # Captura outros erros de banco de dados
             flash(f'Ocorreu um erro no cadastro: {e}', 'danger')
             print(f"Erro ao cadastrar usuário: {e}") # Log para depuração
+            db.rollback() # Reverte a transação em caso de outros erros
     return render_template('cadastro.html')
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -144,12 +157,18 @@ def login():
         email = request.form['email']
         senha = request.form['senha']
         db = get_db()
-        # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+        # NOVO: Crie um cursor a partir da conexão (com DictCursor para SELECT)
+        if current_app.config.get('DATABASE_URL'):
+            cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        else:
+            cur = db
+
         param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
-        user = db.execute(
+        cur.execute( # Use cur.execute
             f'SELECT id FROM usuarios WHERE email = {param_placeholder} AND senha = {param_placeholder}', (
                 email, senha)
-        ).fetchone()
+        )
+        user = cur.fetchone()
         if user:
             session['usuario_id'] = user['id']
             flash('Login realizado com sucesso!', 'success')
@@ -174,18 +193,23 @@ def logout():
 def perfil():
     db = get_db()
     user_id = session['usuario_id']
-    # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+    # NOVO: Crie um cursor a partir da conexão (com DictCursor para SELECT)
+    if current_app.config.get('DATABASE_URL'):
+        cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    else:
+        cur = db
+
     param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
 
     if request.method == 'POST':
         # Processa a atualização de dados
         nome = request.form['nome']
         email = request.form['email']
-        senha = request.form['senha'] # Note: Senha não está hashada
+        senha = request.form['senha'] # Note: Senha não está hashada, considerar hashing para segurança real
         telefone = request.form['telefone']
         
         try:
-            db.execute(
+            cur.execute( # Use cur.execute
                 f'UPDATE usuarios SET nome = {param_placeholder}, email = {param_placeholder}, senha = {param_placeholder}, telefone = {param_placeholder} WHERE id = {param_placeholder}',
                 (nome, email, senha, telefone, user_id)
             )
@@ -194,15 +218,18 @@ def perfil():
             return redirect(url_for('auth.perfil'))
         except (sqlite3.IntegrityError, psycopg2.IntegrityError) as e:
             flash('Este email já está cadastrado para outro usuário.', 'danger')
+            db.rollback()
         except Exception as e:
             flash(f'Ocorreu um erro ao atualizar: {e}', 'danger')
             print(f"Erro ao atualizar perfil: {e}") # Log para depuração
+            db.rollback()
 
     # Busca os dados atuais do usuário para exibir no formulário
-    user = db.execute(
+    cur.execute( # Use cur.execute
         f'SELECT id, nome, email, telefone, tipo_usuario, solicitacao_exclusao FROM usuarios WHERE id = {param_placeholder}',
         (user_id,)
-    ).fetchone()
+    )
+    user = cur.fetchone()
 
     if not user:
         flash('Usuário não encontrado.', 'danger')
@@ -216,11 +243,16 @@ def perfil():
 def solicitar_exclusao():
     db = get_db()
     user_id = session['usuario_id']
-    # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+    # NOVO: Crie um cursor a partir da conexão
+    if current_app.config.get('DATABASE_URL'):
+        cur = db.cursor()
+    else:
+        cur = db
+
     param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
 
     # Atualiza o status da solicitação para pendente (1)
-    db.execute(
+    cur.execute( # Use cur.execute
         f'UPDATE usuarios SET solicitacao_exclusao = 1 WHERE id = {param_placeholder}',
         (user_id,)
     )
@@ -234,9 +266,14 @@ def esqueci_senha():
     if request.method == 'POST':
         email = request.form['email']
         db = get_db()
-        # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+        # NOVO: Crie um cursor a partir da conexão (com DictCursor para SELECT)
+        if current_app.config.get('DATABASE_URL'):
+            cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        else:
+            cur = db
+
         param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
-        user = db.execute(f'SELECT id, email FROM usuarios WHERE email = {param_placeholder}', (email,)).fetchone()
+        user = cur.execute(f'SELECT id, email FROM usuarios WHERE email = {param_placeholder}', (email,)).fetchone() # Use cur.execute
 
         if user:
             # Gerar um token único e com expiração
@@ -244,8 +281,13 @@ def esqueci_senha():
             expiration = datetime.now() + timedelta(hours=1) # Token válido por 1 hora
 
             # Armazenar o token no banco de dados (precisa de uma tabela 'tokens'!)
-            # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
-            db.execute(
+            # NOVO: Crie um cursor separado para a inserção de token (não precisa de DictCursor)
+            if current_app.config.get('DATABASE_URL'):
+                insert_cur = db.cursor() 
+            else:
+                insert_cur = db
+
+            insert_cur.execute( # Use insert_cur.execute
                 f'INSERT INTO tokens (user_id, token, expiration) VALUES ({param_placeholder}, {param_placeholder}, {param_placeholder})',
                 (user['id'], token, expiration)
             )
@@ -268,11 +310,16 @@ def esqueci_senha():
 @bp.route('/resetar_senha/<token>', methods=['GET', 'POST'])
 def resetar_senha(token):
     db = get_db()
-    # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
+    # NOVO: Crie um cursor para buscar o token (com DictCursor para SELECT)
+    if current_app.config.get('DATABASE_URL'):
+        cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    else:
+        cur = db
+
     param_placeholder = "%s" if current_app.config.get('DATABASE_URL') else "?"
     
     # Buscar o token no banco de dados
-    t = db.execute(f'SELECT user_id, expiration FROM tokens WHERE token = {param_placeholder}', (token,)).fetchone()
+    t = cur.execute(f'SELECT user_id, expiration FROM tokens WHERE token = {param_placeholder}', (token,)).fetchone() # Use cur.execute
 
     if not t or t['expiration'] < datetime.now():
         flash('Link de redefinição de senha inválido ou expirado.', 'danger')
@@ -286,14 +333,19 @@ def resetar_senha(token):
             flash('As senhas não coincidem.', 'danger')
             return render_template('resetar_senha.html', token=token) # Passa o token de volta para o form
 
+        # NOVO: Crie um cursor para as atualizações/deleções (sem DictCursor)
+        if current_app.config.get('DATABASE_URL'):
+            update_cur = db.cursor()
+        else:
+            update_cur = db
+
         # Atualizar a senha do usuário
-        # Ajustado para compatibilidade com PostgreSQL (%s) e SQLite (?)
-        db.execute(
+        update_cur.execute( # Use update_cur.execute
             f'UPDATE usuarios SET senha = {param_placeholder} WHERE id = {param_placeholder}',
             (nova_senha, t['user_id'])
         )
         # Invalidar o token usado (removendo-o do banco de dados)
-        db.execute(f'DELETE FROM tokens WHERE token = {param_placeholder}', (token,))
+        update_cur.execute(f'DELETE FROM tokens WHERE token = {param_placeholder}', (token,)) # Use update_cur.execute
         db.commit()
 
         flash('Sua senha foi redefinida com sucesso! Por favor, faça login.', 'success')
